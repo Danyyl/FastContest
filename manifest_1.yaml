@@ -1,0 +1,517 @@
+# Backend stuff
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    project: contest
+    part: backend
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      part: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project: contest
+        part: backend
+    spec:
+      containers:
+        - args:
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: env
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: env
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PASSWORD
+                  name: env
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PORT
+                  name: env
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USER
+                  name: env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: env
+          image: pythondanya/contest:latest
+          name: backend
+          ports:
+            - containerPort: 8000
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: backend
+  name: backend
+spec:
+  ports:
+    - name: "backend-listener"
+      port: 8000
+      targetPort: 8000
+  selector:
+    part: backend
+
+
+---
+
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-autoscale
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2
+    kind: Deployment
+    name: backend
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+
+# Celery stuff
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    project: contest
+    part: celery
+  name: celery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      part: celery
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project: contest
+        part: celery
+    spec:
+      containers:
+        - args:
+          env:
+            - name: C_FORCE_ROOT
+              value: "true"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: env
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: env
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PASSWORD
+                  name: env
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PORT
+                  name: env
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USER
+                  name: env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: env
+          image: pythondanya/contest:celery_1
+          name: celery
+      restartPolicy: Always
+
+---
+
+# Flower
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: flower
+  name: flower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      part: flower
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project: contest
+        part: flower
+    spec:
+      containers:
+        - args:
+          env:
+            - name: C_FORCE_ROOT
+              value: "true"
+            - name: FLOWER_PORT
+              value: "5555"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: env
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: env
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PASSWORD
+                  name: env
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PORT
+                  name: env
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USER
+                  name: env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: env
+          image: pythondanya/contest:flower_1
+          name: flower
+          ports:
+            - containerPort: 5555
+          resources: {}
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: flower
+  name: flower
+spec:
+  ports:
+    - name: "flower-listener"
+      port: 5555
+      targetPort: 5555
+  selector:
+    part: flower
+
+
+---
+
+# Redis
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      part: redis
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project: contest
+        part: redis
+    spec:
+      containers:
+        - image: redis:alpine
+          name: redis
+          ports:
+            - containerPort: 6379
+          resources: {}
+      restartPolicy: Always
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: redis
+  name: redis
+spec:
+  ports:
+    - name: "redis-listener"
+      port: 6379
+      targetPort: 6379
+  selector:
+    part: redis
+
+
+---
+
+# database
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: db
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      part: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        project: contest
+        part: db
+    spec:
+      containers:
+        - env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: env
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: env
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PASSWORD
+                  name: env
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PORT
+                  name: env
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USER
+                  name: env
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: env
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: env
+          image: postgres
+          name: db
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /postgres-volume
+              name: db-claim0
+      restartPolicy: Always
+      volumes:
+        - name: db-claim0
+          persistentVolumeClaim:
+            claimName: db-claim0
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: db
+  name: db
+spec:
+  ports:
+    - name: "db"
+      port: 5432
+      targetPort: 5432
+  selector:
+    part: db
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: db-claim0
+  name: db-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: v1
+data:
+  DB_HOST: db
+  DB_NAME: contest
+  DB_PASSWORD: contest
+  DB_PORT: "5432"
+  DB_USER: contest
+  POSTGRES_DB: contest
+  POSTGRES_PASSWORD: contest
+  POSTGRES_USER: contest
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    project: contest
+    part: backend-env
+  name: env
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  labels:
+    project: contest
+    part: ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+#  - host: back.dan-contest.com
+  - http:
+        paths:
+        - path: /back
+          pathType: Prefix
+          backend:
+            service:
+              name: backend
+              port:
+                number: 8000
+
+        - path: /flower
+          pathType: Prefix
+          backend:
+            service:
+              name: flower
+              port:
+                number: 5555
+
