@@ -1,0 +1,11 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.App {
+    color: #1d8cf8;
+    font-size: x-large;
+    font-style: italic;
+}
