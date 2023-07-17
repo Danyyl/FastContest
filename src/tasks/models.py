@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, String, TIMESTAMP, ForeignKey, Column, Boolean
+from sqlalchemy import Integer, String, TIMESTAMP, ForeignKey, Column, Boolean, Float
 
 from database import Base, get_async_session
 from sqlalchemy.orm import relationship
@@ -26,6 +26,9 @@ class Task(Base):
     topic = relationship("Topic", backref="tasks")
     score = Column(Integer, nullable=False, default=0)
     tags = relationship("TaskTag", back_populates="task")
+    func_name = Column(String, nullable=False)
+    input_data = Column(String, nullable=False)
+    output_data = Column(String, nullable=False)
 
 
 class Tag(Base):
@@ -56,6 +59,8 @@ class UserTask(Base):
     answer = Column(String, nullable=True)
     status = Column(ChoiceType(
         dict(map(lambda item: (item.name, item.value), StatusEnum))), nullable=False, default=StatusEnum.new.value)
+    time = Column(Float, nullable=True)
+    details = Column(String, nullable=True)
     score = Column(Integer, nullable=False, default=0)
     submitted = Column(Boolean, nullable=False, default=False)
     submitted_at = Column(TIMESTAMP, default=datetime.utcnow)

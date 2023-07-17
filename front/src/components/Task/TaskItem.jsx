@@ -5,24 +5,28 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TagsList from "../Tag/TagsList";
+import "../../styles/Task/TaskList.css"
+import {useNavigate} from "react-router";
 
 const TaskItem = (props) => {
+    const navigate = useNavigate();
+
   return (
-     <Card sx={{ minWidth: 275 }}>
+     <Card classes={"Card"} sx={{ minWidth: 275, background: "#c9ced6"}}>
       <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+        <Typography variant="h5"  gutterBottom>
           {props.task.name}
         </Typography>
-        <Typography variant="h5" component="div">
+        <Typography sx={{ fontSize: 14 }} color="text.secondary" component="div">
           {props.task.text}
         </Typography>
-        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        <Typography sx={{ mb: 0.5 }} color="text.secondary">
           {props.task.topic.name}
         </Typography>
         <TagsList tags={props.task.tags}/>
       </CardContent>
       <CardActions>
-        <Button size="small">Learn More</Button>
+        <Button size="small" onClick={() => {navigate("/task/" + props.task.id)}}>Solve</Button>
       </CardActions>
     </Card>
   );

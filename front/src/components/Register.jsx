@@ -14,7 +14,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {login} from "../actions/auth"
+import {register} from "../actions/auth"
 import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
@@ -34,9 +34,9 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-export default function LoginPage() {
+export default function Register() {
 
-  const [credentials, SetCredentials] = useState({email: "", password: ""})
+  const [credentials, SetCredentials] = useState({email: "", password: "", name: ""})
   const dispatch = useDispatch()
 
   const navigate = useNavigate();
@@ -50,12 +50,7 @@ export default function LoginPage() {
         }
     )
   }
-  const user = useSelector(({authReducer}) => authReducer.user)
-  useEffect(()=>{
-    if (user){
-      navigate("/")
-    }
-  }, [user])
+
   // const realToken = useSelector(({authReducer}) => authReducer.token)
   // const [showToken, SetShowToken] = useState("KuKu")
 
@@ -65,7 +60,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-      dispatch(login(credentials.email, credentials.password, navigate));
+      dispatch(register(credentials.email, credentials.password, credentials.name, navigate));
   }
 
   return (
@@ -84,7 +79,7 @@ export default function LoginPage() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign up
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -107,31 +102,27 @@ export default function LoginPage() {
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
+              // autoComplete="current-password"
               value={credentials.password}
               onChange={handleChanges}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="name"
+              label="Name"
+              type="name"
+              id="name"
+              // autoComplete="current-password"
+              value={credentials.name}
+              onChange={handleChanges}
             />
             <Button
               type={"submit"}
             >
-              Sign In
+              Sign Up
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link onClick={() => {navigate("/register")}} variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />

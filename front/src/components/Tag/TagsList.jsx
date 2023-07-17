@@ -4,9 +4,9 @@ import Stack from '@mui/material/Stack';
 
 const TagsList = (props) => {
   return (
-  <Stack direction="row" spacing={1}>
+  <Stack height="5vh" direction="row" spacing={1}>
       {props.tags.map(tag =>
-        <Chip label={tag.tag.name} color="primary" />
+        <Chip label={tag.tag.name} key={tag.tag.id} color="primary" />
       )}
   </Stack>
 

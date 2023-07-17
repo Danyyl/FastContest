@@ -1,4 +1,9 @@
 .MainPage {
-    width: 75%;
-    float: right;
+    /*width: 75%;*/
+    /*float: right;*/
+}
+
+.FilterBlock {
+    margin-left: 4%;
+    padding-bottom: 2%;
 }

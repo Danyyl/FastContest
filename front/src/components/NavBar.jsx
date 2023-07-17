@@ -1,37 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/NavBar.css';
+import {Container} from "@mui/material";
 
 const sidebarNavItems = [
     {
-        display: 'Dashboard',
+        display: 'Tasks',
         to: '/',
         section: ''
     },
     {
-        display: 'Getting Started',
-        to: '/login',
-        section: 'started'
+        display: 'Profile',
+        to: '/me',
+        section: 'me'
     },
-    // {
-    //     display: 'Calendar',
-    //     to: '/calendar',
-    //     section: 'calendar'
-    // },
-    // {
-    //     display: 'User',
-    //     to: '/user',
-    //     section: 'user'
-    // },
-    // {
-    //     display: 'Orders',
-    //     to: '/order',
-    //     section: 'order'
-    // },
+    {
+        display: 'My Tasks',
+        to: '/my-tasks',
+        section: 'my-tasks'
+    },
+    {
+        display: 'Statistic',
+        to: '/stat',
+        section: 'stat'
+    },
 ]
 
 const NavBar = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeIndex, setActiveIndex] = useState(1);
     const [stepHeight, setStepHeight] = useState(0);
     const sidebarRef = useRef();
     const indicatorRef = useRef();
@@ -48,13 +44,13 @@ const NavBar = () => {
     // change active index
     useEffect(() => {
         const curPath = window.location.pathname.split('/')[1];
-        const activeItem = sidebarNavItems.findIndex(item => item.section === curPath);
+        const activeItem = sidebarNavItems.findIndex(item => item.section === curPath) >= 0 ? sidebarNavItems.findIndex(item => item.section === curPath) : 0;
         setActiveIndex(curPath.length === 0 ? 0 : activeItem);
     }, [location]);
 
-    return <div className='sidebar'>
+    return <Container className='sidebar'>
         <div className="sidebar__logo">
-            Animate
+            Menu
         </div>
         <div ref={sidebarRef} className="sidebar__menu">
             <div
@@ -79,7 +75,7 @@ const NavBar = () => {
                 ))
             }
         </div>
-    </div>;
+    </Container>;
 };
 
 export default NavBar;

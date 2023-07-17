@@ -60,6 +60,7 @@ class TaskScheme(BaseModel):
     topic: Optional[TopicScheme]
     score: int
     tags: Optional[List[TaskTagScheme]]
+    func_template: str
 
     class Config:
         orm_mode = True
@@ -79,6 +80,9 @@ class TaskCreate(BaseModel):
     text: str
     topic_id: int
     score: Optional[int] = 0
+    func_name: str
+    input_data: str
+    output_data: str
 
 
 class TaskUpdate(BaseModel):
@@ -103,13 +107,19 @@ class UserTaskScheme(BaseModel):
         orm_mode = True
 
 
-class UserTaskCreate(BaseModel):
+class Solution(BaseModel):
     task_id: int
-    user_id: int
+    resolved: bool
+    status: str
+    error_type: Optional[str]
+    error_value: Optional[str]
+    score: int
+    code: str
 
 
-class UserTaskUpdate(BaseModel):
-    answer: Optional[str]
+class UserTaskAnswer(BaseModel):
+    task_id: int
+    answer: str
 
     @validator("answer")
     def is_correct_func(cls, value=None):
@@ -117,6 +127,21 @@ class UserTaskUpdate(BaseModel):
             return value
         else:
             raise ValueError(["Wrong method format, no return or def statement"])
+
+
+class UserTaskCreate(BaseModel):
+    task_id: int
+
+
+# class UserTaskUpdate(BaseModel):
+#     answer: Optional[str]
+#
+#     @validator("answer")
+#     def is_correct_func(cls, value=None):
+#         if all([temp in value for temp in ["return", "def"]]) or not value:
+#             return value
+#         else:
+#             raise ValueError(["Wrong method format, no return or def statement"])
 
 
 # class ValidUser(BaseModel):
