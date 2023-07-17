@@ -1,0 +1,46 @@
+.Main {
+}
+
+.DataColumn {
+}
+
+.AboutBlock {
+}
+
+.Description {
+    overflow: scroll;
+    height: 70vh;
+    /*background-color: #c9ced6;*/
+}
+
+.Description::-webkit-scrollbar {
+  display: none;
+}
+
+.SecondBlock {
+
+}
+
+.Result {
+    min-height: 5vh;
+    overflow: scroll;
+    height: 13vh;
+}
+
+.Result::-webkit-scrollbar {
+  display: none;
+}
+
+.CodeBlock {
+    overflow: scroll;
+    height: 72vh;
+}
+
+.CodeBlock::-webkit-scrollbar {
+  display: none;
+}
+
+.ButtonBlock {
+    /*align-self: flex-end;*/
+    float: right;
+}

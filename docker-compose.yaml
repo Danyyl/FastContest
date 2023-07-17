@@ -16,23 +16,25 @@ services:
     volumes:
       - .:/app
     command: ["docker/run.sh"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-#  mongodb:
-#    image: mongo:5.0
-#    ports:
-#      - 27017:27017
-#    volumes:
-#      - ./mongodb:/data/db
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=contest
-#      - MONGO_INITDB_ROOT_PASSWORD=contest
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=contest
+      - MONGO_INITDB_ROOT_PASSWORD=contest
 
   db:
       image: postgres
       env_file:
         - .env
       volumes:
-        - ./postgres-volume:/postgres-volume
+        - db_vol:/var/lib/postgresql/data
       ports:
         - "5432:5432"
 
@@ -76,5 +78,7 @@ services:
       - backend
       - redis
       - db
+volumes:
+  db_vol:
 
   #rabbit:
